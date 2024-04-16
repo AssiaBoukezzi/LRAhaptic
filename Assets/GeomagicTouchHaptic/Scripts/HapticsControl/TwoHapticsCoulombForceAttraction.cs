@@ -206,7 +206,7 @@ public class TwoHapticsCoulombForceAttraction : MonoBehaviour
         }
     }
 
-    public GameObject co_embody;
+    
 
     /// <summary>
     /// Process at the start of the simulation
@@ -239,8 +239,9 @@ public class TwoHapticsCoulombForceAttraction : MonoBehaviour
 
     }
 
-    public GameObject prefab;
-
+    public GameObject prefab ;
+    public GameObject co_embody;
+    public float control = 0.5f;
     /// <summary>
     /// Process each frame
     /// </summary>
@@ -254,11 +255,61 @@ public class TwoHapticsCoulombForceAttraction : MonoBehaviour
         print(LeftPhantomDevice.position);
 
         Vector3 pos = new Vector3(LeftPhantomDevice.position.x, 0, LeftPhantomDevice.position.z);
+        
+        float x = 0;
+        float y = 0;
+        float z = 0;
+        
+
+        if(LeftPhantomDevice.position.x < RightPhantomDevice.position.x)
+        {
+            x = LeftPhantomDevice.position.x + (Math.Abs(LeftPhantomDevice.position.x - RightPhantomDevice.position.x) * control);
+        }
+        else
+        {
+            x = LeftPhantomDevice.position.x - (Math.Abs(LeftPhantomDevice.position.x - RightPhantomDevice.position.x) * control);
+        }
+
+        if(LeftPhantomDevice.position.y < RightPhantomDevice.position.y)
+        {
+            y = LeftPhantomDevice.position.y + (Math.Abs(LeftPhantomDevice.position.y - RightPhantomDevice.position.y) * control);
+        }
+        else
+        {
+            y = LeftPhantomDevice.position.y - (Math.Abs(LeftPhantomDevice.position.y - RightPhantomDevice.position.y) * control);
+        }
+
+        if(LeftPhantomDevice.position.z < RightPhantomDevice.position.z)
+        {
+            z = LeftPhantomDevice.position.z + (Math.Abs(LeftPhantomDevice.position.z - RightPhantomDevice.position.z) * control);
+        }
+        else
+        {
+            z = LeftPhantomDevice.position.z - (Math.Abs(LeftPhantomDevice.position.z - RightPhantomDevice.position.z) * control);
+        }
+
+        Vector3 posDiff = new Vector3(x + (Math.Abs(LeftPhantomDevice.position.x - RightPhantomDevice.position.x) * control), y + (Math.Abs(LeftPhantomDevice.position.y - RightPhantomDevice.position.y) * control), z + (Math.Abs(LeftPhantomDevice.position.z - RightPhantomDevice.position.z) * control));
+        Vector3 xyz = new Vector3(x, y, z);
 
         if (HandPosition_Left.y <= 0.01f)
         {
             GameObject newObject = Instantiate(prefab, pos, Quaternion.identity);
         }
+
+        if(control == 0)
+        {
+            co_embody.transform.position = LeftPhantomDevice.position;
+        }
+        else if(control == 1)
+        {
+            co_embody.transform.position = RightPhantomDevice.position;
+        }
+        else
+        {
+            co_embody.transform.position = xyz;
+        }
+        
+        
         
 
     }
@@ -507,10 +558,10 @@ public Color[] penColors;
         Vector3 forceVec = Vector3.zero;
 
         // if two charges overlap...
-        if (dist < 12 * 1.0)
+        if (dist < 12 * 1000.0)
         {
             // Attract the charge to the center of the sphere.
-            forceVec = new Vector3(-0.1f * pos.x, -0.1f * pos.y, -0.1f * pos.z);
+            forceVec = new Vector3(-0.2f * pos.x, -0.2f * pos.y, -0.2f * pos.z);
             cpt++;
         }
         else
