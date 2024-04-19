@@ -241,6 +241,7 @@ public class TwoHapticsCoulombForceAttraction : MonoBehaviour
 
     public GameObject prefab ;
     public GameObject co_embody;
+    public GameObject tip;
     public float control = 0.5f;
     /// <summary>
     /// Process each frame
@@ -254,7 +255,7 @@ public class TwoHapticsCoulombForceAttraction : MonoBehaviour
 
         print(LeftPhantomDevice.position);
 
-        Vector3 pos = new Vector3(LeftPhantomDevice.position.x, 0, LeftPhantomDevice.position.z);
+        Vector3 pos = new Vector3(tip.transform.position.x, -0.05f, tip.transform.position.z);
         
         float x = 0;
         float y = 0;
@@ -291,7 +292,9 @@ public class TwoHapticsCoulombForceAttraction : MonoBehaviour
         Vector3 posDiff = new Vector3(x + (Math.Abs(LeftPhantomDevice.position.x - RightPhantomDevice.position.x) * control), y + (Math.Abs(LeftPhantomDevice.position.y - RightPhantomDevice.position.y) * control), z + (Math.Abs(LeftPhantomDevice.position.z - RightPhantomDevice.position.z) * control));
         Vector3 xyz = new Vector3(x, y, z);
 
-        if (HandPosition_Left.y <= 0.01f)
+        
+
+        if (tip.transform.position.y <= -0.03f)
         {
             GameObject newObject = Instantiate(prefab, pos, Quaternion.identity);
         }
@@ -309,9 +312,6 @@ public class TwoHapticsCoulombForceAttraction : MonoBehaviour
             co_embody.transform.position = xyz;
         }
         
-        
-        
-
     }
 
 public Vector3 Force_R;
@@ -327,14 +327,14 @@ public void setForce(Vector3 Force)
 
 Vector3 CurrentPosition;
 Vector3 CurrentPosition2;
-private float FirstPlanePosition = 0;
+public float FirstPlanePosition = 4f;
 private float FirstPlaneStiffness = 0.25f;
 private float ForceStiffness;
 private float SkinLayerStiffness = 31.5f;
 private float FirstLayerDamping = 4f;
 public float SkinLayerCutting = 1.22f;
 public float FIRST_LAYER_TOP = 0.10f;
-public float SecondPlanePosition = -1.0f;
+public float SecondPlanePosition = 3.3f;
 public float SecondPlaneStiffness = 0.33f;
 public float DEVICE_FORCE_SCALE = 0.4f;
 
@@ -344,7 +344,6 @@ private Vector3 membraneForce2;
 private LineRenderer currentDrawing;
 private int index;
 private int currentColorIndex = 0;
-public Transform tip;
 public Material drawingMaterial;
 public float penWidth = 0.01f;
 public Color[] penColors;
@@ -424,7 +423,7 @@ public Color[] penColors;
         {
             float penetrationDistance = Mathf.Abs(HandPosition_Left.y);
 
-            if (HandPosition_Left.y > SecondPlanePosition + 0.04f)
+            if (HandPosition_Left.y > SecondPlanePosition)
             {
                 LeftPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * FirstPlaneStiffness), 0);
                 HandPosition_Left *= UnitLength;
@@ -435,7 +434,7 @@ public Color[] penColors;
             {
                 LeftPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * SecondPlaneStiffness), 0);
                 HandPosition_Left *= UnitLength;
-                LeftPhantomDevice.position = new Vector3(HandPosition_Left.x, SecondPlanePosition * UnitLength, HandPosition_Left.z);
+                LeftPhantomDevice.position = new Vector3(HandPosition_Left.x, SecondPlanePosition * UnitLength , HandPosition_Left.z);
                 LeftPhantomDevice.rotation = new Quaternion(HandRotation_Left.x, HandRotation_Left.y, HandRotation_Left.z, HandRotation_Left.w);
             }
         }
