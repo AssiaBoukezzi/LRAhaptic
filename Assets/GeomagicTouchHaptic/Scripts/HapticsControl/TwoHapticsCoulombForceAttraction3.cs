@@ -206,14 +206,25 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         }
     }
 
-    
+    private LineRenderer line;
+    private LineRenderer newLigne;
+    private Vector3 previousPosition;
+    public GameObject point;
+    public GameObject LineRender;
+    public Material materialLine;
+
 
     /// <summary>
     /// Process at the start of the simulation
     /// </summary>
     private void Start()
     {
-
+        line = point.GetComponent<LineRenderer>();
+        line.positionCount = 0;
+        previousPosition = point.transform.position;
+        newLigne = line;
+        newLigne.material = materialLine;
+        newLigne.transform.localScale = new Vector3(newLigne.transform.localScale.x, 0f, newLigne.transform.localScale.z);
     }
 
     /// <summary>
@@ -245,8 +256,11 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     public float control = 0.5f;
     bool visual = false;
     bool visual2 = false;
+    bool createLine = false;
+
 
     public Camera myCamera;
+
 
     /// <summary>
     /// Process each frame
@@ -258,7 +272,6 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         LeftPhantomDevice.tool.transform.localRotation = LeftPhantomDevice.rotation;
         RightPhantomDevice.tool.transform.localRotation = RightPhantomDevice.rotation;
 
-        print(LeftPhantomDevice.position);
 
         Vector3 pos = new Vector3(tip.transform.position.x, -0.05f, tip.transform.position.z);
         
@@ -313,11 +326,49 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
             //visual = true;
             myCamera.cullingMask |= (1 << LayerMask.NameToLayer("TransparentFX"));
         }
-        
 
-        if (tip.transform.position.y <= -0.03f)
+        Vector3 currentPosition = pos;
+
+        if (tip.transform.position.y <= -0.03f && tip.transform.position.x > -0.265f && tip.transform.position.x < 0.265f && tip.transform.position.z > -0.276 && tip.transform.position.z < 0.33f)
         {
-            GameObject newObject = Instantiate(prefab, pos, Quaternion.identity);
+            //GameObject newObject = Instantiate(prefab, pos, Quaternion.identity);
+
+
+            //currentPosition.z = 0f;
+
+            if (previousPosition == transform.position)
+            {
+                newLigne.SetPosition(0, currentPosition);
+            }
+            else
+            {
+                newLigne.positionCount++;
+                newLigne.SetPosition(newLigne.positionCount - 1, currentPosition);
+            }
+
+
+            previousPosition = currentPosition;
+            createLine = true;
+        }
+        else
+        {
+            if (createLine)
+            {
+                GameObject lineObject = new GameObject("NewLineRenderer");
+                LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
+
+                lineRenderer.positionCount = 0; // Nombre de points de la ligne
+                lineRenderer.startWidth = 0.005f; // Largeur de début de la ligne
+                lineRenderer.endWidth = 0.005f; // Largeur de fin de la ligne
+                previousPosition = point.transform.position;
+                newLigne = lineRenderer;
+                newLigne.material = materialLine;
+                newLigne.numCornerVertices = 90;
+                newLigne.numCapVertices = 90;
+                newLigne.transform.localScale = new Vector3(newLigne.transform.localScale.x, 0f, newLigne.transform.localScale.z);
+                createLine = false;
+            }
+
         }
 
         if (visual == true || visual2 == true)
@@ -499,7 +550,7 @@ private Buttons button1RightState;
             {
                 LeftPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * SecondPlaneStiffness), 0);
                 HandPosition_Left *= UnitLength;
-                LeftPhantomDevice.position = new Vector3(HandPosition_Left.x, SecondPlanePosition * UnitLength , HandPosition_Left.z);
+                LeftPhantomDevice.position = new Vector3(HandPosition_Left.x, SecondPlanePosition * 0.01f , HandPosition_Left.z);
                 LeftPhantomDevice.rotation = new Quaternion(HandRotation_Left.x, HandRotation_Left.y, HandRotation_Left.z, HandRotation_Left.w);
             }
         }
@@ -603,7 +654,7 @@ private Buttons button1RightState;
             {
                 RightPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * SecondPlaneStiffness), 0);
                 HandPosition_Right *= UnitLength;
-                RightPhantomDevice.position = new Vector3(HandPosition_Right.x, SecondPlanePosition * UnitLength, HandPosition_Right.z);
+                RightPhantomDevice.position = new Vector3(HandPosition_Right.x, SecondPlanePosition * 0.01f, HandPosition_Right.z);
                 RightPhantomDevice.rotation = new Quaternion(HandRotation_Right.x, HandRotation_Right.y, HandRotation_Right.z, HandRotation_Right.w);
             }
         }

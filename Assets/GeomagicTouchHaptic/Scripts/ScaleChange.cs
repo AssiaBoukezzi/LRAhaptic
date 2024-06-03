@@ -2,6 +2,7 @@
 
 public class ScaleChange : MonoBehaviour
 {
+    public GameObject leftHand;
 
     // Cette fonction permet de changer l'échelle du GameObject à une échelle spécifiée à tout moment.
     public void ChangeScaleMoins(Vector3 scale)
@@ -18,34 +19,54 @@ public class ScaleChange : MonoBehaviour
     {
         transform.localScale = Vector3.zero;
     }
-    bool max = false;
+
+    private bool max;
+    //bool min = false;
+    private Vector3 position;
+    //float pos_init;
+    //float z= 0.0f;
+    private Vector3 taille;
+    //Vector3 diff = new Vector3(0.005f, 0.005f, 0.0f);
+    private int cpt;
+    //bool plusMax = false;
+    private float debut;
+    private float fin;
+    private int cpt2;
+    private int cpt3;
+
+
+    private float posInit;
+    private float scaleInit;
+    private float posMin;
+    private float posMax;
+    private float scaleInitX;
+    public float scaleMax = 0.09f;
+
+    private void Start()
+    {
+        posInit = leftHand.transform.position.x;
+        scaleInitX = transform.localScale.x;
+        scaleInit = transform.localScale.y;
+        posMin = posInit - scaleInit;
+        posMax = posMin + 2 * scaleMax;
+    }
 
     void Update()
     {
-        // Vérifie si la touche "Espace" est pressée.
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (leftHand.transform.position.x > posMin && leftHand.transform.position.x < posMax)
         {
-            if(transform.localScale.y - 0.01 <= 0)
+            if(leftHand.transform.position.x < posMin + scaleMax)
             {
-                ChangeScaleZero();
-            }
-            else if (transform.localScale.y < 0.2016675f && max == false )
-            {
-                // Change l'échelle du GameObject pour le doubler en taille.
-                ChangeScalePlus(new Vector3(0.005f, 0.005f, 0.0f));
-
+                transform.localScale = new Vector3(leftHand.transform.position.x - posMin + scaleInitX, leftHand.transform.position.x - posMin, 0.0005f);
             }
             else
             {
-                max = true;
-                ChangeScaleMoins(new Vector3(0.005f, 0.005f, 0.0f));
+                transform.localScale = new Vector3(-leftHand.transform.position.x + posMax + scaleInitX, -leftHand.transform.position.x + posMax, 0.0005f);
             }
         }
-        
-        if (Input.GetKeyDown(KeyCode.A))
+        else
         {
-            // Change l'échelle du GameObject pour le doubler en taille.
-            ChangeScaleMoins(new Vector3(0.01f, 0.02f, 0.0f));
+            transform.localScale = Vector3.zero;
         }
     }
 }
