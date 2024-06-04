@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DetectCollisionTwo : MonoBehaviour
 {
-    int cpt = 0;
+    public static int cpt = 0;
     bool exit = true;
     void OnCollisionEnter(Collision collision)
     {

@@ -8,6 +8,8 @@ TagManager:
   - TOOL
   - CIBLE
   - TRAJ
+  - START
+  - END
   layers:
   - Default
   - TransparentFX
