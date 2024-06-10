@@ -10,6 +10,7 @@ TagManager:
   - TRAJ
   - START
   - END
+  - a
   layers:
   - Default
   - TransparentFX

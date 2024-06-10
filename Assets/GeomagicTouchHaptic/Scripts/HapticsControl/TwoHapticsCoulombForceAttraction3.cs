@@ -213,12 +213,15 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     public GameObject LineRender;
     public Material materialLine;
 
+    private Vector3 posOld;
+    private Vector3 posAct;
 
     /// <summary>
     /// Process at the start of the simulation
     /// </summary>
     private void Start()
     {
+        posAct = HandPosition_Left;
         line = point.GetComponent<LineRenderer>();
         line.positionCount = 0;
         previousPosition = point.transform.position;
@@ -261,7 +264,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
 
     public Camera myCamera;
 
-
+    Vector3 speed = Vector3.zero;
     /// <summary>
     /// Process each frame
     /// </summary>
@@ -272,6 +275,8 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         LeftPhantomDevice.tool.transform.localRotation = LeftPhantomDevice.rotation;
         RightPhantomDevice.tool.transform.localRotation = RightPhantomDevice.rotation;
 
+        
+        
 
         Vector3 pos = new Vector3(tip.transform.position.x, -0.05f, tip.transform.position.z);
         
@@ -456,11 +461,14 @@ private Buttons button1RightState;
         button1RightState = Phantoms.GetButton();
 
         Vector3 pos_diff = new Vector3(HandPosition_Left.x - HandPosition_Right.x, HandPosition_Left.y - HandPosition_Right.y, HandPosition_Left.z - HandPosition_Right.z);
+        posOld = posAct;
+        posAct = HandPosition_Left;
 
+        speed = posAct - posOld;
 
-        if(button1RightState == Buttons.Button2)
+        if (button1RightState == Buttons.Button2)
         {
-            LeftPhantomDevice.force = ForceField(pos_diff);
+            LeftPhantomDevice.force = ForceField(pos_diff, speed);
         }
 
         /*
@@ -517,7 +525,7 @@ private Buttons button1RightState;
             
             if (button1RightState == Buttons.Button2)
             {
-                LeftPhantomDevice.force = ForceS + ForceField(pos_diff);
+                LeftPhantomDevice.force = ForceS + ForceField(pos_diff, speed);
             }
             else
             {
@@ -681,6 +689,8 @@ private Buttons button1RightState;
    
     }
 
+    public float gainAmort = -1f; // gaint et force parfait apres essaie
+    public float force = 0.2f;
     
 
     /// <summary>
@@ -688,19 +698,30 @@ private Buttons button1RightState;
     /// </summary>
     /// <param name="pos">position difference between devices</param>
     /// <returns>the force to be applied to the haptic devices</returns>
-    private Vector3 ForceField (Vector3 pos)
+    private Vector3 ForceField (Vector3 pos, Vector3 speed)
     {
         float dist = pos.magnitude;
         int cpt = 0;
 
+
         Vector3 forceVec = Vector3.zero;
+        Vector3 forceVecUn = Vector3.zero;
+
+        print(speed);
+        
+
+        //speed = posAct - posOld;
 
         // if two charges overlap...
         if (dist < 12 * 1000.0)
         {
+            //speedx = pos.x-posxOld
             // Attract the charge to the center of the sphere.
-            forceVec = new Vector3(-0.2f * pos.x, -0.2f * pos.y, -0.2f * pos.z);
+            //            forceVec = new Vector3(-0.2f * pos.x + gainAmort*speedx, -0.2f * pos.y + gainAmort * speedx, -0.2f * pos.z + gainAmort * speedx);
+            forceVecUn = new Vector3(-force * pos.x, -force * pos.y, -force * pos.z);
+            forceVec = forceVecUn + gainAmort * speed;
             cpt++;
+            //posxOld = pos.x;
         }
         else
         {
