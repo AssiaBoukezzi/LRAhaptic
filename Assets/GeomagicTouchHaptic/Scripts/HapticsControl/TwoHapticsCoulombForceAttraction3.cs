@@ -334,7 +334,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
 
         Vector3 currentPosition = pos;
 
-        if (tip.transform.position.y <= -0.03f && tip.transform.position.x > -0.265f && tip.transform.position.x < 0.265f && tip.transform.position.z > -0.276 && tip.transform.position.z < 0.33f)
+        if (tip.transform.position.y <= -0.048f && tip.transform.position.x > -0.265f && tip.transform.position.x < 0.265f && tip.transform.position.z > -0.276 && tip.transform.position.z < 0.33f)
         {
             //GameObject newObject = Instantiate(prefab, pos, Quaternion.identity);
 
@@ -558,7 +558,7 @@ private Buttons button1RightState;
             {
                 LeftPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * SecondPlaneStiffness), 0);
                 HandPosition_Left *= UnitLength;
-                LeftPhantomDevice.position = new Vector3(HandPosition_Left.x, SecondPlanePosition * 0.01f , HandPosition_Left.z);
+                LeftPhantomDevice.position = new Vector3(HandPosition_Left.x, SecondPlanePosition * UnitLength , HandPosition_Left.z);
                 LeftPhantomDevice.rotation = new Quaternion(HandRotation_Left.x, HandRotation_Left.y, HandRotation_Left.z, HandRotation_Left.w);
             }
         }
