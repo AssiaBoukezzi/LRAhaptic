@@ -527,7 +527,6 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
 
         }
 
-
         if (visual == true || visual2 == true)
         {
             if (control == 0)
@@ -619,8 +618,8 @@ private Buttons button1RightState;
         {
         
             LeftPhantomDevice.force = ForceField(pos_diff, speed);
-            leftPos.Add(LeftPhantomDevice.force);
-            print(" force = "+ LeftPhantomDevice.force);
+            //leftPos.Add(LeftPhantomDevice.force);
+            //print(" force = "+ LeftPhantomDevice.force);
         }
         
 
