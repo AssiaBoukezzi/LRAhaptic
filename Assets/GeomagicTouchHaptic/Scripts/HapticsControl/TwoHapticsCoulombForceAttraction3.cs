@@ -217,6 +217,10 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     private Vector3 posOld;
     private Vector3 posAct;
 
+    private Vector3 posActUnity;
+    private Vector3 posOldUnity;
+
+
     //public GameObject trajectoir;
     private LineRenderer lineRend;
     private LineRenderer lineRendTrajLimit;
@@ -233,6 +237,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     /// </summary>
     private void Start()
     {
+
         /*lineRend = trajectoir.GetComponent<LineRenderer>(); // recuperer les points de la trajectoire optimale
         SaveLineRendererDataToCSV(); // la sauvegarder dans une fichier CSV
 
@@ -245,6 +250,8 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         points = LoadCSVData(fileName3);
         lineRendTrajLimit.positionCount = points.Count;
         lineRendTrajLimit.SetPositions(points.ToArray());*/
+
+        points = LoadCSVData("forces.csv");
 
         
         posAct = HandPosition_Left;
@@ -399,8 +406,13 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     public Camera myCamera;
 
     Vector3 speed = Vector3.zero;
+    Vector3 speedunity = Vector3.zero;
+
     List<Vector3> leftPos = new List<Vector3>();
     int k=0;
+
+    private bool inputA = false;
+
 
     /// <summary>
     /// Process each frame
@@ -477,13 +489,13 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         if (tip.transform.position.y <= -0.048f && tip.transform.position.x > -0.576f && tip.transform.position.x < 0.4f && tip.transform.position.z > -0.276 && tip.transform.position.z < 0.28f)
         {
             //GameObject newObject = Instantiate(prefab, pos, Quaternion.identity);
-            leftPos.Add(LeftPhantomDevice.position);
+            //leftPos.Add(LeftPhantomDevice.position);
             //print("k = "+k+"count = "+ leftPos.Count);
-            if(k<leftPos.Count);
+            /*if(k<leftPos.Count);
             {
-                print(k + " leftPos = " + leftPos[k]);
+                //print(k + " leftPos = " + leftPos[k]);
                 k++;
-            }
+            }*/
 
             //currentPosition.z = 0f;
 
@@ -505,10 +517,10 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         {
             if (createLine)
             {
-                string csv = ConvertVector3ListToCSV(leftPos);
-                string filePath = Application.dataPath + "/forces.csv";
-                SaveCSVToFile(csv, filePath);
-                Debug.Log("CSV file saved to: " + filePath);
+                //string csv = ConvertVector3ListToCSV(leftPos);
+                //string filePath = Application.dataPath + "/forces.csv";
+                //SaveCSVToFile(csv, filePath);
+                //Debug.Log("CSV file saved to: " + filePath);
 
                 GameObject lineObject = new GameObject("NewLineRenderer");
                 LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
@@ -547,6 +559,13 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
             }
         }
 
+        if (Input.GetKey(KeyCode.A))
+        {
+            posActUnity = LeftPhantomDevice.position;
+            posOldUnity = LeftPhantomDevice.position;
+            startTime = DateTime.Now;
+            inputA = true;
+        }
         
     }
 
@@ -584,6 +603,9 @@ public Material drawingMaterial;
 public float penWidth = 0.01f;
 public Color[] penColors;
 private Buttons button1RightState;
+
+
+int i=0;
 
 
 
@@ -827,6 +849,43 @@ private Buttons button1RightState;
             RightPhantomDevice.rotation = new Quaternion(HandRotation_Right.x, HandRotation_Right.y, HandRotation_Right.z, HandRotation_Right.w);
         }
 
+        //Time = DateTime.Now - startTime;
+        //float secondsElapsed = (float)Time.TotalSeconds;
+        //print(secondsElapsed.ToString());
+        //print("force = "+LeftPhantomDevice.force);
+
+        
+
+        if (inputA)
+        {
+            posOldUnity = posActUnity;
+            posActUnity = LeftPhantomDevice.position;
+
+            speedunity = posActUnity - posOldUnity;
+            if (lineList < points.Count -4)
+            {
+                Time = (float)(DateTime.Now - startTime).TotalSeconds;
+                //print("time = " +Time.ToString());
+                lineList = (int)(Time / 0.03846f);
+                desiredPosition = points[lineList];
+                positionDiff = new Vector3((LeftPhantomDevice.position.x - desiredPosition.x)*1000, (LeftPhantomDevice.position.y - desiredPosition.y)*1000, (LeftPhantomDevice.position.z - desiredPosition.z)*1000);
+                //positionDiff = (LeftPhantomDevice.position - desiredPosition)*1000;
+                LeftPhantomDevice.force = ForceField(positionDiff, speedunity);
+                print("ligne = "+lineList + " force = " + LeftPhantomDevice.force);
+
+                //inputA = false;
+            }
+            else
+            {
+                inputA = false;
+                LeftPhantomDevice.force = Vector3.zero;
+            }
+        }
+
+        
+        
+        
+
         HdAPI.hdMakeCurrentDevice(LeftPhantomDevice.hHdAPI);
         Phantoms.SetForce(LeftPhantomDevice.force);
 
@@ -841,6 +900,17 @@ private Buttons button1RightState;
 
    
     }
+
+    private List<Vector3> points;
+    private Vector3 desiredPosition;
+    private Vector3 positionDiff = Vector3.zero;
+
+
+    private int lineList=0;
+    public DateTime startTime;
+    public float Time;
+
+    
 
     public float gainAmort = -1f; // gaint et force parfait apres essaie
     public float force = 0.2f;
