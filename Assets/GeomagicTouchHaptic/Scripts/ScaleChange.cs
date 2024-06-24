@@ -46,7 +46,7 @@ public class ScaleChange : MonoBehaviour
     {
         posInit = leftHand.transform.position.x;
         scaleInitX = transform.localScale.x;
-        scaleInit = transform.localScale.y;
+        scaleInit = transform.localScale.z;
         posMin = posInit - scaleInit;
         posMax = posMin + 2 * scaleMax;
     }
@@ -57,11 +57,11 @@ public class ScaleChange : MonoBehaviour
         {
             if(leftHand.transform.position.x < posMin + scaleMax)
             {
-                transform.localScale = new Vector3(leftHand.transform.position.x - posMin + scaleInitX, leftHand.transform.position.x - posMin, 0.0005f);
+                transform.localScale = new Vector3(leftHand.transform.position.x - posMin + scaleInitX, 0.0005f, leftHand.transform.position.x - posMin);
             }
             else
             {
-                transform.localScale = new Vector3(-leftHand.transform.position.x + posMax + scaleInitX, -leftHand.transform.position.x + posMax, 0.0005f);
+                transform.localScale = new Vector3(-leftHand.transform.position.x + posMax + scaleInitX, 0.0005f, -leftHand.transform.position.x + posMax);
             }
         }
         else

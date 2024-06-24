@@ -13835,6 +13835,7 @@ GameObject:
   - component: {fileID: 526049624}
   - component: {fileID: 526049623}
   - component: {fileID: 526049625}
+  - component: {fileID: 526049626}
   m_Layer: 0
   m_Name: Device_1
   m_TagString: a
@@ -13894,13 +13895,25 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 526049621}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eabb460075140bb41a6359c4dbcaf319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   start: {fileID: 1084240432}
   textMeshPro: {fileID: 44553203}
+--- !u!114 &526049626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 526049621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1be9704b65fd2aa4d868aa9e12959772, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &530571268
 GameObject:
   m_ObjectHideFlags: 0

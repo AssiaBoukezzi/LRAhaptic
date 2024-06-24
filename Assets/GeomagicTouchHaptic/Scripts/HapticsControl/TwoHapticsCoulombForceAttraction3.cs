@@ -217,15 +217,15 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     private Vector3 posOld;
     private Vector3 posAct;
 
-    public GameObject trajectoir;
+    //public GameObject trajectoir;
     private LineRenderer lineRend;
     private LineRenderer lineRendTrajLimit;
     public string fileName = "lineRendererData.csv"; // name file.csv
     public string fileName2 = "lineRendererDataPlus.csv"; // ligne a droite
     public string fileName3 = "lineRendererDataMoins.csv"; // ligne a gauche
 
-    public GameObject trajPlus; 
-    public GameObject trajMoins;
+    //public GameObject trajPlus; 
+    //public GameObject trajMoins;
 
 
     /// <summary>
@@ -233,7 +233,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     /// </summary>
     private void Start()
     {
-        lineRend = trajectoir.GetComponent<LineRenderer>(); // recuperer les points de la trajectoire optimale
+        /*lineRend = trajectoir.GetComponent<LineRenderer>(); // recuperer les points de la trajectoire optimale
         SaveLineRendererDataToCSV(); // la sauvegarder dans une fichier CSV
 
         lineRendTrajLimit = trajPlus.GetComponent<LineRenderer>();
@@ -244,7 +244,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         lineRendTrajLimit = trajMoins.GetComponent<LineRenderer>();
         points = LoadCSVData(fileName3);
         lineRendTrajLimit.positionCount = points.Count;
-        lineRendTrajLimit.SetPositions(points.ToArray());
+        lineRendTrajLimit.SetPositions(points.ToArray());*/
 
         
         posAct = HandPosition_Left;
@@ -398,9 +398,9 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
 
     public Camera myCamera;
 
-    int k = 0;
     Vector3 speed = Vector3.zero;
     List<Vector3> leftPos = new List<Vector3>();
+    int k=0;
 
     /// <summary>
     /// Process each frame
@@ -474,16 +474,16 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
 
         
 
-        if (tip.transform.position.y <= -0.048f && tip.transform.position.x > -0.265f && tip.transform.position.x < 0.265f && tip.transform.position.z > -0.276 && tip.transform.position.z < 0.33f)
+        if (tip.transform.position.y <= -0.048f && tip.transform.position.x > -0.576f && tip.transform.position.x < 0.4f && tip.transform.position.z > -0.276 && tip.transform.position.z < 0.28f)
         {
             //GameObject newObject = Instantiate(prefab, pos, Quaternion.identity);
-            /*leftPos.Add(HandPosition_Left);
+            leftPos.Add(LeftPhantomDevice.position);
             //print("k = "+k+"count = "+ leftPos.Count);
             if(k<leftPos.Count);
             {
                 print(k + " leftPos = " + leftPos[k]);
                 k++;
-            }*/
+            }
 
             //currentPosition.z = 0f;
 

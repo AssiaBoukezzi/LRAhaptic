@@ -237,8 +237,7 @@ public class TwoHapticsCoulombForceAttraction4 : MonoBehaviour
 
     private void Start()
     {
-        points = LoadCSVData();
-        int p=0;
+        //points = LoadCSVData();
         foreach (var point in points)
         {
             //print(p+" les points sont : "+point);
@@ -347,10 +346,10 @@ public class TwoHapticsCoulombForceAttraction4 : MonoBehaviour
         {
             //Vector3 pos_diff = new Vector3(LeftPhantomDevice.position.x - points[j].x, LeftPhantomDevice.position.y - points[j].y, LeftPhantomDevice.position.z - points[j].z)*199;
             //print(j +" force = "+ForceField(pos_diff, Vector3.zero));
-            LeftPhantomDevice.force = points[j];
+            //LeftPhantomDevice.force = points[j];
             //print(points[j] +" : " + HandPosition_Left);
-            print(j +" force = " + LeftPhantomDevice.force);
-            j++;
+            //print(j +" force = " + LeftPhantomDevice.force);
+            //j++;
         }
         else{
             LeftPhantomDevice.force = Vector3.zero;
@@ -379,7 +378,7 @@ Vector3 CurrentPosition2;
 public float FirstPlanePosition = 4f;
 private float FirstPlaneStiffness = 0.25f;
 private float ForceStiffness;
-private float SkinLayerStiffness = 31.5f;
+//private float SkinLayerStiffness = 31.5f;
 private float FirstLayerDamping = 4f;
 public float SkinLayerCutting = 1.22f;
 public float FIRST_LAYER_TOP = 0.10f;
