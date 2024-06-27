@@ -9,6 +9,12 @@ using UnityEngine.UI;
 
 public class StartExp : MonoBehaviour
 {
+    //pour demarrer le prichain essai
+    public Button submitButton;
+    public Text messageText; 
+
+    //Fin des essais
+    public Text messageTextFin;
 
     public GameObject start;
     public TextMeshProUGUI textMeshPro;
@@ -44,17 +50,29 @@ public class StartExp : MonoBehaviour
         if(collision.gameObject.tag == "START")
         {
             print("start");
-            Destroy(start);
+            DetectCollisionTwo.cpt = 0;
+            //Destroy(start);
+            start.gameObject.SetActive(false);
             startTime = DateTime.Now;
         }
-        if(collision.gameObject.tag == "END" && cpt == 0)
+        if(collision.gameObject.tag == "END")
         {
-            Time = DateTime.Now - startTime;
-            float secondsElapsed = (float)Time.TotalSeconds;
-            Debug.Log("Temps écoulé : " + secondsElapsed);
-            cpt++;
-            textMeshPro.text = "Temps = <color=#FF0000>" + secondsElapsed.ToString() + "s</color> \n  Cibles : <color=#FF0000>" + DetectCollisionTwo.cpt + "</color>";
-            SavePerformanceToFile(secondsElapsed.ToString());
+            if(cpt < 5)
+            {
+                Time = DateTime.Now - startTime;
+                float secondsElapsed = (float)Time.TotalSeconds;
+                Debug.Log("Temps écoulé : " + secondsElapsed);
+                cpt++;
+                textMeshPro.text = "Temps = <color=#FF0000>" + secondsElapsed.ToString() + "s</color> \n  Cibles : <color=#FF0000>" + DetectCollisionTwo.cpt + "</color>";
+                SavePerformanceToFile(secondsElapsed.ToString());
+                submitButton.gameObject.SetActive(true);
+                messageText.gameObject.SetActive(true);
+            }
+            else
+            {
+                messageTextFin.gameObject.SetActive(true);
+            }
+            
         }
 
         

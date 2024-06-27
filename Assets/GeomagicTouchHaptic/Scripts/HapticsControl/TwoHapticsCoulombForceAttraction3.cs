@@ -221,15 +221,18 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     private Vector3 posOldUnity;
 
 
-    //public GameObject trajectoir;
+    public GameObject trajectoir;
     private LineRenderer lineRend;
     private LineRenderer lineRendTrajLimit;
     public string fileName = "lineRendererData.csv"; // name file.csv
     public string fileName2 = "lineRendererDataPlus.csv"; // ligne a droite
     public string fileName3 = "lineRendererDataMoins.csv"; // ligne a gauche
 
-    //public GameObject trajPlus; 
-    //public GameObject trajMoins;
+    public GameObject trajPlus; 
+    public GameObject trajMoins;
+
+    public string filePath = "participants_data.csv"; // Chemin du fichier CSV
+    private List<string[]> rowData = new List<string[]>(); // Liste pour stocker les lignes de données
 
 
     /// <summary>
@@ -237,11 +240,31 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     /// </summary>
     private void Start()
     {
+        // Ajouter les en-têtes des colonnes
+        string[] headers = new string[] {
+            "Numero du participant",
+            "Numero d'essaie",
+            "Condition",
+            "Position X",
+            "Position Y",
+            "Position Z",
+            "Nombre cibles touchées",
+            "Score cibles",
+            "Score trajectoire",
+            "Temps total",
+            "Temps entre chaque point"
+        };
+
+        rowData.Add(headers);
+        AddData(1, 1, "ConditionA", 0.5f, 1.2f, -0.3f, 5, 100, 80, 30.5f, 0.1f);
+        AddData(1, 2, "ConditionB", 0.8f, 1.1f, -0.2f, 4, 90, 75, 28.3f, 0.12f);
+        WriteToFile(filePath);
+
 
         /*lineRend = trajectoir.GetComponent<LineRenderer>(); // recuperer les points de la trajectoire optimale
-        SaveLineRendererDataToCSV(); // la sauvegarder dans une fichier CSV
+        SaveLineRendererDataToCSV(lineRend); */ // la sauvegarder dans une fichier CSV
 
-        lineRendTrajLimit = trajPlus.GetComponent<LineRenderer>();
+        /*lineRendTrajLimit = trajPlus.GetComponent<LineRenderer>();
         List<Vector3> points = LoadCSVData(fileName2);
         lineRendTrajLimit.positionCount = points.Count;
         lineRendTrajLimit.SetPositions(points.ToArray());
@@ -261,6 +284,47 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         newLigne = line;
         newLigne.material = materialLine;
         newLigne.transform.localScale = new Vector3(newLigne.transform.localScale.x, 0f, newLigne.transform.localScale.z);
+    }
+
+    // Fonction pour ajouter des données
+    public void AddData(int participantNumber, int trialNumber, string condition, float posX, float posY, float posZ,
+                        int targetsHit, int targetScore, int trajectoryScore, float totalTime, float timeBetweenPoints)
+    {
+        string[] row = new string[] {
+            participantNumber.ToString(),
+            trialNumber.ToString(),
+            condition,
+            posX.ToString(),
+            posY.ToString(),
+            posZ.ToString(),
+            targetsHit.ToString(),
+            targetScore.ToString(),
+            trajectoryScore.ToString(),
+            totalTime.ToString(),
+            timeBetweenPoints.ToString()
+        };
+        rowData.Add(row);
+    }
+
+    // Fonction pour écrire les données dans un fichier CSV
+    private void WriteToFile(string filePath)
+    {
+        string Pathh = Path.Combine(Application.dataPath, filePath);
+        string[][] output = new string[rowData.Count][];
+        for (int i = 0; i < output.Length; i++)
+        {
+            output[i] = rowData[i];
+        }
+
+        int length = output.GetLength(0);
+        using (StreamWriter writer = new StreamWriter(Pathh))
+        {
+            for (int i = 0; i < length; i++)
+            {
+                writer.WriteLine(string.Join(";", output[i]));
+            }
+        }
+        Debug.Log("CSV file created at: " + Pathh);
     }
 
     List<Vector3> LoadCSVData(string file)
@@ -299,7 +363,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         return points;
     }
 
-    void SaveLineRendererDataToCSV()
+    void SaveLineRendererDataToCSV(LineRenderer lineRend)
     {
         if (lineRend == null)
         {
@@ -326,7 +390,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
             writer.WriteLine("x,y,z");  // Header
             foreach (Vector3 point in points)
             {
-                string line = string.Format("{0};{1};{2}", point.x+0.06f, point.y, point.z);
+                string line = string.Format("{0};{1};{2}", 1.2*point.x, point.y, point.z);
                 writer.WriteLine(line);
             }
             Debug.Log("Line Renderer data saved to " + fileName2);
@@ -336,7 +400,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
             writer.WriteLine("x,y,z");  // Header
             foreach (Vector3 point in points)
             {
-                string line = string.Format("{0};{1};{2}", point.x-0.06f, point.y, point.z);
+                string line = string.Format("{0};{1};{2}", 1.2*point.x, point.y, point.z);
                 writer.WriteLine(line);
             }
             Debug.Log("Line Renderer data saved to " + fileName3);
@@ -489,7 +553,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         if (tip.transform.position.y <= -0.048f && tip.transform.position.x > -0.576f && tip.transform.position.x < 0.4f && tip.transform.position.z > -0.276 && tip.transform.position.z < 0.28f)
         {
             //GameObject newObject = Instantiate(prefab, pos, Quaternion.identity);
-            //leftPos.Add(LeftPhantomDevice.position);
+            leftPos.Add(currentPosition);
             //print("k = "+k+"count = "+ leftPos.Count);
             /*if(k<leftPos.Count);
             {
@@ -517,10 +581,10 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         {
             if (createLine)
             {
-                //string csv = ConvertVector3ListToCSV(leftPos);
-                //string filePath = Application.dataPath + "/forces.csv";
-                //SaveCSVToFile(csv, filePath);
-                //Debug.Log("CSV file saved to: " + filePath);
+                string csv = ConvertVector3ListToCSV(leftPos);
+                string filePath = Application.dataPath + "/positions.csv";
+                SaveCSVToFile(csv, filePath);
+                Debug.Log("CSV file saved to: " + filePath);
 
                 GameObject lineObject = new GameObject("NewLineRenderer");
                 LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
@@ -606,6 +670,8 @@ private Buttons button1RightState;
 
 
 int i=0;
+private int F = 1;
+private int Fo = 1;
 
 
 
@@ -728,17 +794,20 @@ int i=0;
                 HandPosition_Left *= UnitLength;
                 LeftPhantomDevice.position = new Vector3(HandPosition_Left.x, HandPosition_Left.y, HandPosition_Left.z);
                 LeftPhantomDevice.rotation = new Quaternion(HandRotation_Left.x, HandRotation_Left.y, HandRotation_Left.z, HandRotation_Left.w);
+                Fo = 1;
             }
             else
             {
-                LeftPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * SecondPlaneStiffness), 0)*10;
+                LeftPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * SecondPlaneStiffness), 0)*Fo;
                 HandPosition_Left *= UnitLength;
                 LeftPhantomDevice.position = new Vector3(HandPosition_Left.x, SecondPlanePosition * UnitLength , HandPosition_Left.z);
                 LeftPhantomDevice.rotation = new Quaternion(HandRotation_Left.x, HandRotation_Left.y, HandRotation_Left.z, HandRotation_Left.w);
+                Fo= Fo+5;
             }
         }
         else
         {
+            Fo = 1;
             LeftPhantomDevice.force += Vector3.zero;
             HandPosition_Left *= UnitLength;
             LeftPhantomDevice.position = new Vector3(HandPosition_Left.x, HandPosition_Left.y, HandPosition_Left.z);
@@ -832,17 +901,20 @@ int i=0;
                 HandPosition_Right *= UnitLength;
                 RightPhantomDevice.position = new Vector3(HandPosition_Right.x, HandPosition_Right.y, HandPosition_Right.z);
                 RightPhantomDevice.rotation = new Quaternion(HandRotation_Right.x, HandRotation_Right.y, HandRotation_Right.z, HandRotation_Right.w);
+                F=1;
             }
             else
             {
-                RightPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * SecondPlaneStiffness), 0);
+                RightPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * SecondPlaneStiffness), 0)*F;
                 HandPosition_Right *= UnitLength;
-                RightPhantomDevice.position = new Vector3(HandPosition_Right.x, SecondPlanePosition * 0.01f, HandPosition_Right.z);
+                RightPhantomDevice.position = new Vector3(HandPosition_Right.x, SecondPlanePosition * UnitLength, HandPosition_Right.z);
                 RightPhantomDevice.rotation = new Quaternion(HandRotation_Right.x, HandRotation_Right.y, HandRotation_Right.z, HandRotation_Right.w);
+                F++;
             }
         }
         else
         {
+            F=1;
             RightPhantomDevice.force += Vector3.zero;
             HandPosition_Right *= UnitLength;
             RightPhantomDevice.position = new Vector3(HandPosition_Right.x, HandPosition_Right.y, HandPosition_Right.z);
@@ -870,7 +942,8 @@ int i=0;
                 desiredPosition = points[lineList];
                 positionDiff = new Vector3((LeftPhantomDevice.position.x - desiredPosition.x)*1000, (LeftPhantomDevice.position.y - desiredPosition.y)*1000, (LeftPhantomDevice.position.z - desiredPosition.z)*1000);
                 //positionDiff = (LeftPhantomDevice.position - desiredPosition)*1000;
-                LeftPhantomDevice.force = ForceField(positionDiff, speedunity);
+                LeftPhantomDevice.force.x = ForceField(positionDiff, speedunity).x;
+                LeftPhantomDevice.force.z = ForceField(positionDiff, speedunity).z;
                 print("ligne = "+lineList + " force = " + LeftPhantomDevice.force);
 
                 //inputA = false;
