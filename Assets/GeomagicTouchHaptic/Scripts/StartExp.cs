@@ -9,6 +9,12 @@ using UnityEngine.UI;
 
 public class StartExp : MonoBehaviour
 {
+    //sauvegarde des données
+    public string filePath2 = "_participants_data_perform.csv"; // Chemin du fichier CSV
+    public List<string[]> rowData2 = new List<string[]>(); // Liste pour stocker les lignes de données
+
+    
+
     //pour demarrer le prichain essai
     public Button submitButton;
     public Text messageText; 
@@ -20,28 +26,64 @@ public class StartExp : MonoBehaviour
     public TextMeshProUGUI textMeshPro;
     public DateTime startTime;
     public TimeSpan Time;
-    private int cpt = 0;
+    public static int essai=0;
     private LineRenderer line;
 
     private string filePath;
 
+    public static bool end = false; 
+
     void Start()
     {
-        // Initialize the file path
-        filePath = Application.dataPath + "/participantInput.txt";
+        // Ajouter les en-têtes des colonnes        
+        string[] headers2 = new string[] {
+            "Numero du participant",
+            "Numero d'essaie",
+            "Condition",
+            "Nombre cibles touchées",
+            "Score cibles",
+            "Score trajectoire",
+            "Temps total"
+        };
+
+        rowData2.Add(headers2);
     }
 
-    void SavePerformanceToFile(string time)
+    // Fonction pour ajouter des données
+    public void AddData2(string participantNumber, int trialNumber, string condition,
+                        int targetsHit, int targetScore, float trajectoryScore, float totalTime)
     {
-        try
+        string[] row = new string[] {
+            participantNumber,
+            trialNumber.ToString(),
+            condition,
+            targetsHit.ToString(),
+            targetScore.ToString(),
+            trajectoryScore.ToString(),
+            totalTime.ToString()
+        };
+        rowData2.Add(row);
+    }
+
+    // Fonction pour écrire les données dans un fichier CSV
+    public void WriteToFile(string filePath)
+    {
+        string Pathh = Path.Combine(Application.dataPath, filePath);
+        string[][] output = new string[rowData2.Count][];
+        for (int i = 0; i < output.Length; i++)
         {
-            File.AppendAllText(filePath, time + "\n");
-            Debug.Log("Time saved to: " + filePath);
+            output[i] = rowData2[i];
         }
-        catch (System.Exception e)
+
+        int length = output.GetLength(0);
+        using (StreamWriter writer = new StreamWriter(Pathh))
         {
-            Debug.LogError("Failed to save name: " + e.Message);
+            for (int i = 0; i < length; i++)
+            {
+                writer.WriteLine(string.Join(";", output[i]));
+            }
         }
+        Debug.Log("CSV file created at: " + Pathh);
     }
 
 
@@ -54,22 +96,28 @@ public class StartExp : MonoBehaviour
             //Destroy(start);
             start.gameObject.SetActive(false);
             startTime = DateTime.Now;
+            essai++;
         }
         if(collision.gameObject.tag == "END")
         {
-            if(cpt < 5)
+            //calcule du temps total
+            Time = DateTime.Now - startTime;
+            float secondsElapsed = (float)Time.TotalSeconds;
+            textMeshPro.text = "Temps = <color=#FF0000>" + secondsElapsed.ToString() + "s</color> \n  Cibles : <color=#FF0000>" + DetectCollisionTwo.cpt + "</color>";
+            if(essai < 6)
             {
-                Time = DateTime.Now - startTime;
-                float secondsElapsed = (float)Time.TotalSeconds;
-                Debug.Log("Temps écoulé : " + secondsElapsed);
-                cpt++;
-                textMeshPro.text = "Temps = <color=#FF0000>" + secondsElapsed.ToString() + "s</color> \n  Cibles : <color=#FF0000>" + DetectCollisionTwo.cpt + "</color>";
-                SavePerformanceToFile(secondsElapsed.ToString());
+                if(essai > 1)
+                {
+                    AddData2(ParticipantInput.userName, essai, ParticipantInput.condition, DetectCollisionTwo.cpt, 0, TwoHapticsCoulombForceAttraction3.scoreDTW, secondsElapsed);
+                }
+                
                 submitButton.gameObject.SetActive(true);
                 messageText.gameObject.SetActive(true);
             }
             else
             {
+                end = true;
+                WriteToFile(ParticipantInput.userName+filePath2);
                 messageTextFin.gameObject.SetActive(true);
             }
             

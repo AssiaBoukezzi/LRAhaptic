@@ -8,6 +8,7 @@ public class ParticipantInput : MonoBehaviour
 {
     //pour le numero de partipant 
     public InputField nameInputField;
+    public InputField conditionInputField;
     public Button submitButton;
     public Text messageText; 
     public GameObject start;
@@ -42,7 +43,7 @@ public class ParticipantInput : MonoBehaviour
         foreach (GameObject obj in allObjects)
         {
             // Si l'objet a le nom spécifié, le détruire
-            if (obj.name == name || obj.name == name2)
+            if ((obj.name == name || obj.name == name2) && obj.GetComponent<LineRenderer>().positionCount != 0 )
             {
                 obj.gameObject.SetActive(false);
             }
@@ -51,10 +52,15 @@ public class ParticipantInput : MonoBehaviour
         Debug.Log("All objects named '" + name + "' have been destroyed.");
     }
 
+    public static string userName;
+    public static string condition;
+
     void OnSubmitButtonClick()
     {
         // Get the name from the input field
-        string userName = nameInputField.text;
+        userName = nameInputField.text;
+        condition = conditionInputField.text;
+        //Data.Instance.participant = userName;
 
         // Save the name to a file
         SaveNameToFile(userName);
@@ -62,6 +68,7 @@ public class ParticipantInput : MonoBehaviour
         // Clear the input field and hide it along with the submit button
         nameInputField.text = "";
         nameInputField.gameObject.SetActive(false);
+        conditionInputField.gameObject.SetActive(false);
         submitButton.gameObject.SetActive(false);
         messageText.gameObject.SetActive(false);
 
