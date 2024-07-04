@@ -234,11 +234,13 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     public GameObject trajMoins;
 
     //sauvegarde des données
-    public string filePath = "_participants_data_positions.csv"; // Chemin du fichier CSV
+    public string filePath = "_participants_data_positions_pre_post_test.csv"; // Chemin du fichier CSV
+    public string filePath3 = "_participants_data_positions.csv"; // Chemin du fichier CSV
     public List<string[]> rowData = new List<string[]>(); // Liste pour stocker les lignes de données
+    public List<string[]> rowData3 = new List<string[]>(); // Liste pour stocker les lignes de données
 
     
-    private List<Vector3> trajOptimal;
+    public static List<Vector3> trajOptimal;
 
     /// <summary>
     /// Process at the start of the simulation
@@ -257,6 +259,21 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
             "temps"
         };
         rowData.Add(headers);
+
+        if(ParticipantInput.condition == "a")
+        {
+            string[] headers3 = new string[] {
+                "Numero du participant",
+                "Numero d'essaie",
+                "Condition",
+                "Position X",
+                "Position Y",
+                "Position Z",
+                "Cible touché",
+                "temps"
+            };
+            rowData3.Add(headers3);
+        }
         
 
         // recuperer les points de la trajectoire optimale
@@ -308,8 +325,25 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         rowData.Add(row);
     }
 
+    // phase entrainement
+    public void AddData3(string participantNumber, int trialNumber, string condition, float posX, float posY, float posZ,
+                        int targetHit, float timeBetweenPoints)
+    {
+        string[] row3 = new string[] {
+            participantNumber,
+            trialNumber.ToString(),
+            condition,
+            posX.ToString(),
+            posY.ToString(),
+            posZ.ToString(),
+            targetHit.ToString(),
+            timeBetweenPoints.ToString()
+        };
+        rowData3.Add(row3);
+    }
+
     // Fonction pour écrire les données dans le fichier CSV
-    public void WriteToFile(string filePath)
+    public void WriteToFile(string filePath, List<string[]> rowData)
     {
         string Pathh = Path.Combine(Application.dataPath, filePath);
         string[][] output = new string[rowData.Count][];
@@ -474,7 +508,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     Vector3 speed = Vector3.zero;
     Vector3 speedunity = Vector3.zero;
 
-    List<Vector3> leftPos = new List<Vector3>();
+    public static List<Vector3> leftPos = new List<Vector3>();
     int k=0;
 
 
@@ -485,9 +519,9 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     public TimeSpan TimeBetween;
     public float secondsElapsedBetween;
 
-    private int essaiAct=1;
+    private int essaiAct=0;
 
-    public static float scoreDTW = 0;
+    //public static float scoreDTW = 0;
 
 
     /// <summary>
@@ -562,20 +596,16 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
 
         
 
-        if (tip.transform.position.y <= -0.048f && tip.transform.position.x > -0.576f && tip.transform.position.x < 0.5f && tip.transform.position.z > -0.276 && tip.transform.position.z < 0.28f)
+        if (StartExp.startBeforeEnd && tip.transform.position.y <= -0.048f && tip.transform.position.x > -0.576f && tip.transform.position.x < 0.5f && tip.transform.position.z > -0.276 && tip.transform.position.z < 0.28f)
         {
             if(essaiAct == StartExp.essai)
             {
                 leftPos.Add(currentPosition);
             }
-            else
+            else // reinitialiser la nouvelle trajectoire pour le nouvel essai
             {
-                SimpleDTW dtw = new SimpleDTW(trajOptimal,leftPos);
-                dtw.computeDTW();
-                scoreDTW = (float)dtw.getSum(); //donne la valeur du dtw
-                print("DTW = "+ scoreDTW);
                 essaiAct++;
-                leftPos = new List<Vector3>();
+                leftPos = new List<Vector3>();  
             }
             
 
@@ -585,8 +615,28 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
 
             print("essai : "+ StartExp.essai);
 
-            AddData(ParticipantInput.userName, StartExp.essai, ParticipantInput.condition, currentPosition.x, currentPosition.y, currentPosition.z, 
+            if(ParticipantInput.condition == "a")
+            {
+                if(StartExp.essai > 0 && StartExp.essai < 11)
+                {
+                    AddData(ParticipantInput.userName, StartExp.essai, ParticipantInput.condition, currentPosition.x, currentPosition.y, currentPosition.z, 
                     DetectCollisionTwo.touch, secondsElapsedBetween);
+                }
+                
+            }
+            else if(StartExp.essai == 1 || StartExp.essai == 2 || StartExp.essai == 13 || StartExp.essai == 14)
+            {
+                AddData(ParticipantInput.userName, StartExp.essai, ParticipantInput.condition, currentPosition.x, currentPosition.y, currentPosition.z, 
+                    DetectCollisionTwo.touch, secondsElapsedBetween);
+            }
+            else if(StartExp.essai < 13 && StartExp.essai > 2)
+            {
+                AddData3(ParticipantInput.userName, StartExp.essai, ParticipantInput.condition, currentPosition.x, currentPosition.y, currentPosition.z, 
+                    DetectCollisionTwo.touch, secondsElapsedBetween);
+            }
+            else{}
+
+            
 
             startTimeBetween = DateTime.Now;
 
@@ -661,7 +711,7 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
             }
         }
 
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.W))
         {
             posActUnity = LeftPhantomDevice.position;
             posOldUnity = LeftPhantomDevice.position;
@@ -671,7 +721,8 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
 
         if(StartExp.end)
         {
-            WriteToFile(ParticipantInput.userName + filePath);
+            WriteToFile(ParticipantInput.userName + filePath, rowData);
+            WriteToFile(ParticipantInput.userName + filePath3, rowData3);
             StartExp.end = false;
         }
         

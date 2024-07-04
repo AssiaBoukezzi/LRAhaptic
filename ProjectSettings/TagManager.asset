@@ -12,6 +12,7 @@ TagManager:
   - END
   - a
   - limit
+  - nouvelEssai
   layers:
   - Default
   - TransparentFX
