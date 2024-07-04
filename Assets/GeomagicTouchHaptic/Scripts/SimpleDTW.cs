@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,20 +16,19 @@ namespace DTW
     class SimpleDTW
     {
         private double[] x1, y1, z1, x2, y2, z2;
-
         double[,] distance;
         double[,] f;
-        List<Vector3> Traj1;
-        List<Vector3> Traj2;
+        public List<Vector3> Traj1;
+        public List<Vector3> Traj2;
         ArrayList pathX;
         ArrayList pathY;
         ArrayList distanceList;
         double sum;
 
-        public SimpleDTW(List<Vector3> _Traj1, List<Vector3> _Traj2)
+        public SimpleDTW(List<Vector3> _Traj1, List<Vector3> _Traj2, int n = 1000)
         {
-            Traj1 = _Traj1;
-            Traj2 = _Traj2;
+            Traj1 = resample(_Traj1,n);
+            Traj2 = resample(_Traj2,n);
 
             //exctraction of x,y and z element of each point of the vector3 lists
             x1 = new double[Traj1.Count];
@@ -151,6 +151,63 @@ namespace DTW
                 }
             }
             return f[i, j];
+        }
+        public static List<Vector3> resample(List<Vector3> Traj, int n)
+        {
+            // resample the trajectory with n number of equidistant points
+            List<Vector3> NewTraj = new List<Vector3>(n);
+
+            float pathLength = PathLength(Traj)/ (n - 1);
+
+            float D = 0.0f;
+            int i = 1;
+            while (i < Traj.Count)
+            {   
+
+                float d = GetDistanceVec(Traj[i],Traj[i-1]);
+                if (D + d >= pathLength)
+                {
+                    float deltaDistance = (pathLength - D) / d;
+                    Vector3 newVec = new Vector3(
+                        Traj[i-1].x + deltaDistance * (Traj[i].x - Traj[i-1].x),
+                        Traj[i-1].y + deltaDistance * (Traj[i].y - Traj[i-1].y),
+                        Traj[i-1].z + deltaDistance * (Traj[i].z - Traj[i-1].z)
+                    );
+
+                    NewTraj.Add(newVec);
+                    Traj.Insert(i,newVec);
+                    D = 0.0f;
+                }
+                else
+                {
+                    D += d;
+                }
+                i++;
+            }
+            
+            if (NewTraj.Count == n - 1) // Fix a possible roundoff error
+            {
+                NewTraj.Add(Traj[Traj.Count - 1]);
+            }
+
+            return NewTraj;
+        }
+
+        public static float PathLength(List<Vector3> Trajectoire)
+        {
+            float pathLength = 0.0f;
+            int i = 1;
+            while (i < Trajectoire.Count)
+            {
+                pathLength = pathLength + GetDistanceVec(Trajectoire[i],Trajectoire[i-1]);
+                i++;
+            }
+            return pathLength;
+        }
+
+        public static float GetDistanceVec(Vector3 Vec1, Vector3 Vec2)
+        {
+            return (float)Math.Sqrt((Math.Pow(Vec1.x - Vec2.x, 2) + Math.Pow(Vec1.y - Vec2.y, 2))+ Math.Pow(Vec1.z - Vec2.z, 2));
         }
 
 
