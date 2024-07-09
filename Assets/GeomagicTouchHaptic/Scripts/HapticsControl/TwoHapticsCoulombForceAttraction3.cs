@@ -227,8 +227,8 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
     private LineRenderer lineRend;
     private LineRenderer lineRendTrajLimit;
     public string fileName = "lineRendererData.csv"; // name file.csv
-    public string fileName2 = "lineRendererDataPlus.csv"; // ligne a droite
-    public string fileName3 = "lineRendererDataMoins.csv"; // ligne a gauche
+    public string fileName2 = "right_boundary.csv"; // ligne a droite
+    public string fileName3 = "left_boundary.csv"; // ligne a gauche
 
     public GameObject trajPlus; 
     public GameObject trajMoins;
@@ -289,11 +289,13 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
         /*lineRendTrajLimit = trajPlus.GetComponent<LineRenderer>();
         List<Vector3> points = LoadCSVData(fileName2);
         lineRendTrajLimit.positionCount = points.Count;
+        print("point.count = " + points.Count);
         lineRendTrajLimit.SetPositions(points.ToArray());
 
         lineRendTrajLimit = trajMoins.GetComponent<LineRenderer>();
         points = LoadCSVData(fileName3);
         lineRendTrajLimit.positionCount = points.Count;
+        print("point.count = " + points.Count);
         lineRendTrajLimit.SetPositions(points.ToArray());*/
 
         points = LoadCSVData("forces.csv");
@@ -381,11 +383,13 @@ public class TwoHapticsCoulombForceAttraction3 : MonoBehaviour
                     string[] values = line.Split(';');
                     if (values.Length == 3)
                     {
+                        print("3");
                         if (float.TryParse(values[0], out float x) &&
                             float.TryParse(values[1], out float y) &&
                             float.TryParse(values[2], out float z))
                         {
                             points.Add(new Vector3(x, y, z));
+                            print("x= "+x);
                         }
                     }
                 }
@@ -797,13 +801,13 @@ private int Fo = 1;
         posAct = HandPosition_Left;
 
         speed = posAct - posOld;
-        if (button1RightState == Buttons.Button2)
-        {
+        // if (button1RightState == Buttons.Button2)
+        // {
         
-            LeftPhantomDevice.force = ForceField(pos_diff, speed);
-            //leftPos.Add(LeftPhantomDevice.force);
-            //print(" force = "+ LeftPhantomDevice.force);
-        }
+        //     LeftPhantomDevice.force = ForceField(pos_diff, speed);
+        //     //leftPos.Add(LeftPhantomDevice.force);
+        //     //print(" force = "+ LeftPhantomDevice.force);
+        // }
         
 
 
@@ -873,7 +877,7 @@ private int Fo = 1;
             
             if (button1RightState == Buttons.Button2)
             {
-                LeftPhantomDevice.force = ForceS + ForceField(pos_diff, speed);
+                LeftPhantomDevice.force = ForceField(pos_diff, speed);
             }
             else
             {
@@ -901,6 +905,7 @@ private int Fo = 1;
                 {
                     LeftPhantomDevice.force = Vector3.zero;
                 }
+                else if(button1RightState == Buttons.Button2){}
                 else
                 {
                     LeftPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * FirstPlaneStiffness), 0);
@@ -916,6 +921,7 @@ private int Fo = 1;
                 {
                     LeftPhantomDevice.force = Vector3.zero;
                 }
+                else if(button1RightState == Buttons.Button2){}
                 else
                 {
                     LeftPhantomDevice.force += new Vector3(0, (float)(penetrationDistance * SecondPlaneStiffness), 0)*Fo;
@@ -942,7 +948,7 @@ private int Fo = 1;
 
         if (button1RightState == Buttons.Button1)
         {
-            RightPhantomDevice.force = -1.0f * LeftPhantomDevice.force;
+            //RightPhantomDevice.force = -1.0f * LeftPhantomDevice.force;
         }
 
         /*
@@ -998,10 +1004,11 @@ private int Fo = 1;
             ForceS2.z = 0;
             if (button1RightState == Buttons.Button1)
             {
-                RightPhantomDevice.force = ForceS2 - 1.0f * LeftPhantomDevice.force;
+                //RightPhantomDevice.force = ForceS2 - 1.0f * LeftPhantomDevice.force;
+                RightPhantomDevice.force = ForceS2;
             }
             else
-                RightPhantomDevice.force = ForceS2;
+               RightPhantomDevice.force = ForceS2;
 
             /*
             if(visual == false)

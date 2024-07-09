@@ -18,8 +18,8 @@ namespace DTW
         private double[] x1, y1, z1, x2, y2, z2;
         double[,] distance;
         double[,] f;
-        public List<Vector3> Traj1;
-        public List<Vector3> Traj2;
+        private List<Vector3> Traj1;
+        private List<Vector3> Traj2;
         ArrayList pathX;
         ArrayList pathY;
         ArrayList distanceList;
@@ -27,8 +27,10 @@ namespace DTW
 
         public SimpleDTW(List<Vector3> _Traj1, List<Vector3> _Traj2, int n = 1000)
         {
-            Traj1 = resample(_Traj1,n);
-            Traj2 = resample(_Traj2,n);
+            Traj1 = new List<Vector3>(_Traj1);
+            Traj2 = new List<Vector3>(_Traj2);
+            Traj1 = resample(Traj1,n);
+            Traj2 = resample(Traj2,n);
 
             //exctraction of x,y and z element of each point of the vector3 lists
             x1 = new double[Traj1.Count];
@@ -152,10 +154,11 @@ namespace DTW
             }
             return f[i, j];
         }
-        public static List<Vector3> resample(List<Vector3> Traj, int n)
+        public List<Vector3> resample(List<Vector3> Traj, int n)
         {
             // resample the trajectory with n number of equidistant points
             List<Vector3> NewTraj = new List<Vector3>(n);
+            List<Vector3> OldTraj = new List<Vector3>(n);
 
             float pathLength = PathLength(Traj)/ (n - 1);
 
@@ -189,7 +192,7 @@ namespace DTW
             {
                 NewTraj.Add(Traj[Traj.Count - 1]);
             }
-
+            Traj = OldTraj;
             return NewTraj;
         }
 

@@ -27,6 +27,7 @@ public class StartExp : MonoBehaviour
     public GameObject background;
     public TextMeshProUGUI numTrial;
     private int nbT = 14;
+    public TextMeshProUGUI phase;
 
     //Fin des essais
     public TextMeshProUGUI messageTextFin;
@@ -133,6 +134,7 @@ public class StartExp : MonoBehaviour
 
     public static bool startBeforeEnd = false;
     private float scoreDTW = 0;
+    private List<Vector3> optimal;
 
 
     private void OnTriggerEnter(Collider collision)
@@ -162,15 +164,19 @@ public class StartExp : MonoBehaviour
             print("DTW = "+ scoreDTW);
 
             string score;
-            if(scoreDTW <= 20)
+            if(scoreDTW <= 15)
             {
                 score = "Très bien";
             }
-            else if(scoreDTW <= 75)
+            else if(scoreDTW <= 30)
             {
                 score = "Bien";
             }
-            else if(scoreDTW <= 150)
+            else if(scoreDTW <= 70)
+            {
+                score = "Moyen";
+            }
+            else if(scoreDTW <= 100)
             {
                 score = "Mauvais";
             }
@@ -178,7 +184,7 @@ public class StartExp : MonoBehaviour
             {
                 score = "Très mauvais";
             }
-            textMeshPro.text = "Temps = <color=#FF0000>" + secondsElapsed.ToString() + "s</color> \n  Cibles : <color=#FF0000>" + DetectCollisionTwo.cpt + "</color> \n Score : <color=#FF0000>" + score + "</color>";
+            textMeshPro.text = "Temps = <color=#FF0000>" + secondsElapsed.ToString() + "s</color> \n  Cibles : <color=#FF0000>" + DetectCollisionTwo.cpt + "</color> \n Score : <color=#FF0000>" +scoreDTW + " - "+ score + "</color>";
             
             if(ParticipantInput.condition == "a")
             {
@@ -190,16 +196,18 @@ public class StartExp : MonoBehaviour
                 }
                 else if(essai == 0)
                 {
-
                     DestroyObjectsByName(objectName, "Line");
                     start.gameObject.SetActive(true);
+                    phase.text = "Phase pre-test 0/2";
+                    background.gameObject.SetActive(true);
+                    boutton.gameObject.SetActive(true);
                 }
                 else
                 {
                     end = true;
                     AddData2(ParticipantInput.userName, essai, ParticipantInput.condition, DetectCollisionTwo.cpt, 0, scoreDTW, secondsElapsed);
                     WriteToFile(ParticipantInput.userName+filePath2, rowData2);
-                    textMeshPro.text = + " Merci pour votre participation";
+                    messageTextFin.gameObject.SetActive(true);
                     background.gameObject.SetActive(true);
                     boutton.gameObject.SetActive(false);
                 
@@ -207,29 +215,56 @@ public class StartExp : MonoBehaviour
                 
                 
             }
-            else if(essai == 1 || essai == 2 || essai == 13 || essai == 14)
+            else if(essai == 1 || essai == 2 || essai == 13)
             {
                 AddData2(ParticipantInput.userName, essai, ParticipantInput.condition, DetectCollisionTwo.cpt, 0, scoreDTW, secondsElapsed);        
-                StartCoroutine(CountDownTrial());
+                //StartCoroutine(CountDownTrial());
+                background.gameObject.SetActive(true);
+                boutton.gameObject.SetActive(true);
+                if(essai == 1 || essai == 2)
+                {
+                    phase.text = "Phase pre-test "+essai+"/2";
+                }
+                else
+                {
+                    phase.text = "Phase post-test "+(essai-12)+"/2";
+                }
+                
+                numTrial.text = "Vous avez fini l'essai "+ essai + "/" +nbT;
+                DestroyObjectsByName(objectName, "Line");
+                start.gameObject.SetActive(true);
+
             }
             else if(essai == 0)
             {
                 DestroyObjectsByName(objectName, "Line");
                 start.gameObject.SetActive(true);
+                textMeshPro.text ="Vous allez commencer la phase pre-test";
+                phase.text = "";
+                background.gameObject.SetActive(true);
+                boutton.gameObject.SetActive(true);
             }
             else if(essai < 13 && essai > 2)
             {
+                phase.text = "Phase ... "+ (essai-2) +"/10";
                 AddData4(ParticipantInput.userName, essai, ParticipantInput.condition, DetectCollisionTwo.cpt, 0, scoreDTW, secondsElapsed);        
-                StartCoroutine(CountDownTrial());
+                //StartCoroutine(CountDownTrial());
+                background.gameObject.SetActive(true);
+                boutton.gameObject.SetActive(true);
+                numTrial.text = "Vous avez fini l'essai "+ essai + "/" +nbT;
+                DestroyObjectsByName(objectName, "Line");
+                start.gameObject.SetActive(true);
             }
             else
             {
                 end = true;
                 AddData2(ParticipantInput.userName, essai, ParticipantInput.condition, DetectCollisionTwo.cpt, 0, scoreDTW, secondsElapsed);
-                AddData4(ParticipantInput.userName, essai, ParticipantInput.condition, DetectCollisionTwo.cpt, 0, scoreDTW, secondsElapsed); 
+                //AddData4(ParticipantInput.userName, essai, ParticipantInput.condition, DetectCollisionTwo.cpt, 0, scoreDTW, secondsElapsed); 
                 WriteToFile(ParticipantInput.userName+filePath2, rowData2);
                 WriteToFile(ParticipantInput.userName+filePath4, rowData4);
-                textMeshPro.text = "Merci pour votre participation";
+                phase.text = "Phase post-test "+(essai-12)+"/2";
+                numTrial.text = "Vous avez fini l'essai "+ essai + "/" +nbT;
+                messageTextFin.gameObject.SetActive(true);
                 background.gameObject.SetActive(true);
                 boutton.gameObject.SetActive(false);
                 
@@ -245,6 +280,8 @@ public class StartExp : MonoBehaviour
 
         
     }
+
+
     IEnumerator CountDownTrial()
     {
         //description.text = "Vous avez fini l'essai numéro "+ essai +", le prochaine commence dans : ";
